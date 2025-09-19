@@ -6,93 +6,115 @@
   <style>
     body {
       margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       font-family: Arial, sans-serif;
       color: white;
-      text-align: center;
     }
 
     .card {
-      background: rgba(0,0,0,0.3); /* полупрозрачная рамка */
+      background: rgba(255,255,255,0.15);
       padding: 40px 60px;
       border-radius: 24px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
       align-items: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .photo {
-      width: 250px;
-      height: 250px;
-      border-radius: 16px;
+      width: 200px;
+      height: 200px;
       object-fit: cover;
-      border: 4px solid rgba(255,255,255,0.4);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 3px solid rgba(255,255,255,0.7);
+      transition: transform 0.3s linear;
     }
 
-    .title {
-      margin-top: 25px;
-      font-size: 48px;
+    .rotate {
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: 32px;
+      text-align: center;
+    }
+
+    #timer {
+      font-size: 28px;
+      margin: 20px 0;
       font-weight: bold;
     }
 
-    .timer {
-      margin-top: 35px;
-      font-size: 56px;
-      font-weight: bold;
-    }
-
-    .sticker {
-      margin-top: 40px;
-      width: 150px;
+    .pigeon {
+      width: 100px;
       height: auto;
-      animation: flap 1s infinite ease-in-out;
-      transform-origin: center;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: transform 0.2s;
+    }
+
+    .pigeon:hover {
+      transform: scale(1.1);
+    }
+
+    .flap {
+      animation: flap 0.5s infinite alternate;
     }
 
     @keyframes flap {
-      0%   { transform: rotate(0deg) scale(1); }
-      25%  { transform: rotate(-5deg) scale(1.05); }
-      50%  { transform: rotate(0deg) scale(1); }
-      75%  { transform: rotate(5deg) scale(1.05); }
-      100% { transform: rotate(0deg) scale(1); }
+      from { transform: rotate(-10deg) scale(1.05); }
+      to   { transform: rotate(10deg)  scale(0.95); }
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <img src="Nazar.png" alt="Фото" class="photo">
-    <div class="title">До конца рабства</div>
-    <div class="timer" id="timer">Загрузка...</div>
-    <img src="pigeon.png" alt="Голубь" class="sticker">
+    <img src="Nazar.png" alt="Nazar" class="photo" id="photo">
+    <h1>До конца рабства</h1>
+    <div id="timer"></div>
+    <img src="pigeon.png" alt="Голубь" class="pigeon" id="pigeon" onclick="playSong()">
   </div>
 
-  <script>
-    function getRemainingWorkTime() {
-      let now = new Date();
-      let endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-      let remainingMs = 0;
+  <!-- Музыка -->
+  <audio id="song" src="Older.mp3"></audio>
 
-      for (let d = new Date(now); d <= endOfMonth; d.setDate(d.getDate() + 1)) {
-        let day = d.getDay(); // 0 = вс, 6 = сб
-        if (day >= 1 && day <= 5) {
+  <script>
+    // === ТАЙМЕР ===
+    function getRemainingWorkTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const lastDay = new Date(year, month + 1, 0);
+
+      let remainingMs = 0;
+      for (let d = new Date(now); d <= lastDay; d.setDate(d.getDate() + 1)) {
+        if (d.getDay() >= 1 && d.getDay() <= 5) { // пн-пт
           let start = new Date(d);
-          start.setHours(9,0,0,0);
+          start.setHours(9, 0, 0, 0);
           let end = new Date(d);
-          end.setHours(17,0,0,0);
+          end.setHours(17, 0, 0, 0);
 
           if (d.toDateString() === now.toDateString()) {
             if (now < start) {
-              remainingMs += 8 * 3600 * 1000;
-            } else if (now < end) {
-              remainingMs += end - now;
+              remainingMs += (end - start);
+            } else if (now >= start && now < end) {
+              remainingMs += (end - now);
             }
           } else {
-            remainingMs += 8 * 3600 * 1000;
+            remainingMs += (end - start);
           }
         }
       }
@@ -101,19 +123,46 @@
 
     function updateTimer() {
       let ms = getRemainingWorkTime();
-      let sec = Math.floor(ms / 1000);
-      let days = Math.floor(sec / (3600*8));
-      sec %= (3600*8);
-      let hours = Math.floor(sec / 3600);
-      sec %= 3600;
-      let minutes = Math.floor(sec / 60);
-      sec %= 60;
+
+      let seconds = Math.floor(ms / 1000);
+      let days = Math.floor(seconds / (3600 * 8));
+      seconds %= 3600 * 8;
+
+      let hours = Math.floor(seconds / 3600);
+      seconds %= 3600;
+
+      let minutes = Math.floor(seconds / 60);
+      seconds %= 60;
+
       document.getElementById("timer").textContent =
-        `${days}д ${hours}ч ${minutes}м ${sec}с`;
+        days + " Д " +
+        hours.toString().padStart(2, '0') + " Ч " +
+        minutes.toString().padStart(2, '0') + " М " +
+        seconds.toString().padStart(2, '0') + " С";
     }
 
     setInterval(updateTimer, 1000);
     updateTimer();
+
+    // === МУЗЫКА + АНИМАЦИИ ===
+    function playSong() {
+      const audio = document.getElementById("song");
+      const pigeon = document.getElementById("pigeon");
+      const photo = document.getElementById("photo");
+
+      audio.volume = 0.3; // громкость тише
+
+      if (audio.paused) {
+        audio.play();
+        pigeon.classList.add("flap");
+        photo.classList.add("rotate");
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        pigeon.classList.remove("flap");
+        photo.classList.remove("rotate");
+      }
+    }
   </script>
 </body>
 </html>
