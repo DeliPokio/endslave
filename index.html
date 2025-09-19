@@ -13,6 +13,36 @@
       background: linear-gradient(135deg, #1e3c72, #2a5298);
       font-family: Arial, sans-serif;
       color: white;
+      flex-direction: column;
+    }
+
+    /* === Меню === */
+    .menu {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+    }
+
+    .menu a:hover {
+      background: rgba(255,255,255,0.3);
     }
 
     .card {
@@ -25,6 +55,7 @@
       align-items: center;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      margin-top: 80px; /* чтобы карточка не перекрывалась меню */
     }
 
     .photo {
@@ -81,6 +112,11 @@
   </style>
 </head>
 <body>
+  <!-- === МЕНЮ === -->
+  <div class="menu">
+    <a href="index2.html">Таймер до конца работы</a>
+  </div>
+
   <div class="card">
     <img src="Nazar.png" alt="Nazar" class="photo" id="photo">
     <h1>До конца рабства</h1>
