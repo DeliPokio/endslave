@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Таймер до конца работы</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      font-family: Arial, sans-serif;
+      color: white;
+      flex-direction: column;
+    }
+
+    /* === Меню === */
+    .menu {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+      margin-right: 10px;
+    }
+
+    .menu a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      padding: 40px 60px;
+      border-radius: 24px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      margin-top: 80px; /* чтобы карточка не перекрывалась меню */
+    }
+
+    .photo {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 3px solid rgba(255,255,255,0.7);
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: 32px;
+      text-align: center;
+    }
+
+    #timer {
+      font-size: 28px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- === МЕНЮ === -->
+  <div class="menu">
+    <a href="index.html">Главная</a>
+    <a href="index2.html">Таймер до конца работы</a>
+  </div>
+
+  <div class="card">
+    <img src="1.png" alt="Фото" class="photo" id="photo">
+    <h1>До конца работы</h1>
+    <div id="timer"></div>
+  </div>
+
+  <script>
+    function getRemainingToday() {
+      const now = new Date();
+      const end = new Date();
+      end.setHours(17, 0, 0, 0); // конец рабочего дня (17:00)
+
+      if (now >= end) {
+        return 0; // рабочий день закончился
+      }
+
+      // если ещё рабочий день
+      const start = new Date();
+      start.setHours(9, 0, 0, 0);
+
+      if (now < start) {
+        return end - start; // до начала работы не считаем, показываем весь рабочий день
+      }
+
+      return end - now;
+    }
+
+    function updateTimer() {
+      let ms = getRemainingToday();
+      let photo = document.getElementById("photo");
+
+      if (ms <= 0) {
+        document.getElementById("timer").textContent = "Рабочий день окончен!";
+        photo.src = "2.gif"; // меняем gif
+        return;
+      }
+
+      let seconds = Math.floor(ms / 1000);
+      let hours = Math.floor(seconds / 3600);
+      seconds %= 3600;
+
+      let minutes = Math.floor(seconds / 60);
+      seconds %= 60;
+
+      document.getElementById("timer").textContent =
+        hours.toString().padStart(2, '0') + " Ч " +
+        minutes.toString().padStart(2, '0') + " М " +
+        seconds.toString().padStart(2, '0') + " С";
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
